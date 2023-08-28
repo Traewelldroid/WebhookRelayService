@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34018.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebhookRelayService", "WebhookRelayService\WebhookRelayService.csproj", "{E3942C9B-7BDA-4107-965B-07C4836A8078}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1AADC524-D99D-4F4D-A7FE-2652989A3193}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{17D3AC62-1D6D-4570-8C73-C17236A8F690}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7E85DD12-9E45-4689-9A6B-05541EE4A947}"
+	ProjectSection(SolutionItems) = preProject
+		docker.yml = docker.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3942C9B-7BDA-4107-965B-07C4836A8078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3942C9B-7BDA-4107-965B-07C4836A8078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3942C9B-7BDA-4107-965B-07C4836A8078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3942C9B-7BDA-4107-965B-07C4836A8078}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{17D3AC62-1D6D-4570-8C73-C17236A8F690} = {1AADC524-D99D-4F4D-A7FE-2652989A3193}
+		{7E85DD12-9E45-4689-9A6B-05541EE4A947} = {17D3AC62-1D6D-4570-8C73-C17236A8F690}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BE4B15E8-330E-42F9-B753-7CDF9826B363}
+	EndGlobalSection
+EndGlobal
