@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace WebhookRelayService.Controllers
 {
@@ -14,9 +15,12 @@ namespace WebhookRelayService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Webhook([FromBody] string body)
+        public async Task<IActionResult> Webhook()
         {
-            _logger.LogInformation(body);
+            string rawContent = string.Empty;
+            using var reader = new StreamReader(Request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false);
+            rawContent = await reader.ReadToEndAsync();
+            _logger.LogInformation(rawContent);
             return Ok("Ok.");
         }
     }
