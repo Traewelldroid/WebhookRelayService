@@ -8,8 +8,7 @@ using WebhookRelayService.Repositories;
 using WebhookRelayService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var settings = new Settings();
-builder.Configuration.GetSection("WebhookRelaySettings").Bind(settings);
+var settings = builder.Configuration.GetSection("WebhookRelaySettings").Get<Settings>();
 
 builder.WebHost.UseSentry(s =>
 {

@@ -2,7 +2,7 @@
 {
     public class Settings
     {
-        public string SentryDsn { get; } = "";
-        public string PostgresConnection { get; } = "";
+        public string SentryDsn { get; set; }
+        public string PostgresConnection { get; set; }
     }
 }
