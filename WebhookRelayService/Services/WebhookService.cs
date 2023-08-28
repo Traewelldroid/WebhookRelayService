@@ -15,16 +15,25 @@ namespace WebhookRelayService.Services
     {
         private IWebhookUserRepository _webhookUserRepository;
         private HttpClient _httpClient;
+        private Settings _settings;
+        private ILogger _logger;
 
-        public WebhookService(IWebhookUserRepository webhookUserRepository)
+        public WebhookService(IWebhookUserRepository webhookUserRepository, Settings settings, ILogger<WebhookService> logger)
         {
             _webhookUserRepository = webhookUserRepository;
             _httpClient = new HttpClient();
+            _settings = settings;
+            _logger = logger;
         }
 
         public async Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature)
         {
             var user = await _webhookUserRepository.GetByWebhookId(webhookId);
+
+            if (_settings.Logging)
+            {
+                _logger.LogInformation($"Secret: {user.WebhookSecret}");
+            }
 
             await ValidateSignature(user.WebhookSecret, payload, signature);
 
@@ -32,6 +41,10 @@ namespace WebhookRelayService.Services
             var response = await _httpClient.PostAsync(user.NotificationEndpoint, notification);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
+                if (_settings.Logging)
+                {
+                    _logger.LogInformation($"Error when pushing notification for webhook user {user.Id}");
+                }
                 await _webhookUserRepository.Delete(user);
             }
         }
@@ -45,8 +58,13 @@ namespace WebhookRelayService.Services
             using var hash = new HMACSHA256(secretBytes);
             var signedBytes = await hash.ComputeHashAsync(stream);
             var signed = BitConverter.ToString(signedBytes).Replace("-", "").ToLowerInvariant();
-            if (signature != signed)
+            var verificationSucceeded = signature == signed;
+            if (!verificationSucceeded)
             {
+                if (_settings.Logging)
+                {
+                    _logger.LogInformation("Signature verification failed.");
+                }
                 throw new UnauthorizedAccessException();
             }
         }

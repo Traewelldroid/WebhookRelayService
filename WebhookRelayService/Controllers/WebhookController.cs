@@ -13,11 +13,13 @@ namespace WebhookRelayService.Controllers
     {
         private ILogger _logger;
         private IWebhookService _webhookService;
+        private Settings _settings;
 
-        public WebhookController(ILogger<WebhookController> logger, IWebhookService webhookService)
+        public WebhookController(ILogger<WebhookController> logger, IWebhookService webhookService, Settings settings)
         {
             _logger = logger;
             _webhookService = webhookService;
+            _settings = settings;
         }
 
         [HttpPost]
@@ -36,11 +38,17 @@ namespace WebhookRelayService.Controllers
                 var webhookId = int.Parse(Request.Headers["X-Trwl-Webhook-Id"].ToString() ?? "-1");
                 var signature = Request.Headers["Signature"].ToString();
 
+                if (_settings.Logging)
+                {
+                    _logger.LogInformation(requestBody);
+                }
+
                 await _webhookService.HandleWebhook(webhookId, webhook, requestBody, signature);
 
                 return Ok();
             } catch (Exception ex)
             {
+                _logger.LogError("Webhook error", ex);
                 SentrySdk.CaptureException(ex);
                 return StatusCode(500);
             }
