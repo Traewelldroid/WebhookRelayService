@@ -24,6 +24,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 // Add repositories and services
 builder.Services.AddSingleton(settings);
+builder.Services.AddTransient<IWebhookService, WebhookService>();
 builder.Services.AddTransient<IWebhookUserService, WebhookUserService>();
 builder.Services.AddTransient<IWebhookUserRepository, WebhookUserRepository>();
 

@@ -7,6 +7,7 @@ namespace WebhookRelayService.Services
     public interface IWebhookUserService
     {
         public Task<Guid> Create(WebhookUserCreateDTO dto);
+        public Task Delete(Guid id);
     }
 
     public class WebhookUserService : IWebhookUserService
@@ -25,6 +26,12 @@ namespace WebhookRelayService.Services
             var user = _mapper.Map<WebhookUser>(dto);
             user = await _repository.Create(user);
             return user.Id;
+        }
+
+        public async Task Delete(Guid id)
+        {
+            var user = await _repository.GetById(id);
+            await _repository.Delete(user);
         }
     }
 }
