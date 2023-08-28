@@ -6,9 +6,18 @@ namespace WebhookRelayService.Controllers
     [Route("webhook")]
     public class WebhookController : ControllerBase
     {
-        public async Task<IActionResult> Webhook()
+        private ILogger _logger;
+
+        public WebhookController(ILogger<WebhookController> logger)
         {
-            return Ok();
+            _logger = logger;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Webhook([FromBody] string body)
+        {
+            _logger.LogInformation(body);
+            return Ok("Ok.");
         }
     }
 }
