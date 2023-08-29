@@ -41,7 +41,8 @@ namespace WebhookRelayService.Services
 
             if (_settings.Logging)
             {
-                _logger.LogInformation(webhook.GetNotificationJson());
+                _logger.LogInformation("Plain", webhook.Notification);
+                _logger.LogInformation("Notification", webhook.GetNotificationJson());
             }
 
             var response = await _httpClient.PostAsync(user.NotificationEndpoint, notification);

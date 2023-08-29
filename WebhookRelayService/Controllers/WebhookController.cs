@@ -28,7 +28,11 @@ namespace WebhookRelayService.Controllers
             try
             {
                 var requestBody = await GetRequestBody();
-                var webhook = JsonSerializer.Deserialize<Webhook>(requestBody);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                };
+                var webhook = JsonSerializer.Deserialize<Webhook>(requestBody, options);
 
                 if (webhook == null)
                 {
