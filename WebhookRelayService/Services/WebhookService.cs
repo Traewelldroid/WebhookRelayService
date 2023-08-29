@@ -65,7 +65,10 @@ namespace WebhookRelayService.Services
                 {
                     _logger.LogInformation("Signature verification failed.");
                 }
-                throw new UnauthorizedAccessException();
+                else
+                {
+                    throw new UnauthorizedAccessException();
+                }
             }
         }
     }
