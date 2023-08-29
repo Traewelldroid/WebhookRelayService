@@ -38,6 +38,12 @@ namespace WebhookRelayService.Services
             await ValidateSignature(user.WebhookSecret, payload, signature);
 
             var notification = new StringContent(webhook.GetNotificationJson(), Encoding.UTF8, "application/json");
+
+            if (_settings.Logging)
+            {
+                _logger.LogInformation(webhook.GetNotificationJson());
+            }
+
             var response = await _httpClient.PostAsync(user.NotificationEndpoint, notification);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
