@@ -14,6 +14,8 @@ logger.Info("Startup...");
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.GetSection("WebhookRelaySettings").Get<Settings>();
 
+logger.Info($"Logging: {settings.Logging}");
+
 builder.WebHost.UseSentry(s =>
 {
     s.Dsn = settings.SentryDsn;
