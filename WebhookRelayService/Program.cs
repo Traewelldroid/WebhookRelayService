@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
 using System.Diagnostics;
 using WebhookRelayService;
 using WebhookRelayService.BackgroundServices;
 using WebhookRelayService.Models;
 using WebhookRelayService.Repositories;
 using WebhookRelayService.Services;
+
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Info("Startup...");
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.GetSection("WebhookRelaySettings").Get<Settings>();
@@ -16,13 +21,8 @@ builder.WebHost.UseSentry(s =>
     s.TracesSampleRate = 1;
 });
 
-builder.Services.AddLogging(config =>
-{
-    config.ClearProviders();
-    config.AddConfiguration(builder.Configuration.GetSection("Logging"));
-    config.AddConsole();
-    config.AddDebug();
-});
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 // Add services to the container.
 
