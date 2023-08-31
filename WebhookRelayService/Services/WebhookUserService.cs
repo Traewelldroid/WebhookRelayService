@@ -14,17 +14,26 @@ namespace WebhookRelayService.Services
     {
         private readonly IWebhookUserRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IHttpService _httpService;
 
-        public WebhookUserService(IWebhookUserRepository repository, IMapper mapper)
+        public WebhookUserService(IWebhookUserRepository repository, IMapper mapper, IHttpService httpService)
         {
             _repository = repository;
             _mapper = mapper;
+            _httpService = httpService;
         }   
 
         public async Task<Guid> Create(WebhookUserCreateDTO dto)
         {
             var user = _mapper.Map<WebhookUser>(dto);
-            user = await _repository.Create(user);
+            if (await CheckEndpoint(user.NotificationEndpoint))
+            {
+                user = await _repository.Create(user);
+            } 
+            else
+            {
+                throw new InvalidDataException("Invalid UP endpoint");
+            }
             return user.Id;
         }
 
@@ -32,6 +41,13 @@ namespace WebhookRelayService.Services
         {
             var user = await _repository.GetById(id);
             await _repository.Delete(user);
+        }
+
+        private async Task<bool> CheckEndpoint(string endpoint)
+        {
+            var httpResponse = await _httpService.SendGet(endpoint);
+            var responseContent = await httpResponse.Content.ReadAsStringAsync();
+            return responseContent.Contains("{\"unifiedpush\":{\"version\":1}}");
         }
     }
 }

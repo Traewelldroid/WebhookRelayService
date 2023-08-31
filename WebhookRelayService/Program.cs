@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Sentry;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using WebhookRelayService;
 using WebhookRelayService.BackgroundServices;
 using WebhookRelayService.Models;
@@ -27,6 +25,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton(settings);
 builder.Services.AddTransient<IWebhookService, WebhookService>();
 builder.Services.AddTransient<IWebhookUserService, WebhookUserService>();
+builder.Services.AddTransient<IHttpService, HttpService>();
 builder.Services.AddTransient<IWebhookUserRepository, WebhookUserRepository>();
 
 builder.Services.AddHostedService<ClearWebhookUsers>();

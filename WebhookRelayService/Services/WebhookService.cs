@@ -16,16 +16,16 @@ namespace WebhookRelayService.Services
     public class WebhookService : IWebhookService
     {
         private IWebhookUserRepository _webhookUserRepository;
-        private HttpClient _httpClient;
         private Settings _settings;
         private ILogger _logger;
+        private IHttpService _httpService;
 
-        public WebhookService(IWebhookUserRepository webhookUserRepository, Settings settings, ILogger<WebhookService> logger)
+        public WebhookService(IWebhookUserRepository webhookUserRepository, Settings settings, ILogger<WebhookService> logger, IHttpService httpService)
         {
             _webhookUserRepository = webhookUserRepository;
-            _httpClient = new HttpClient();
             _settings = settings;
             _logger = logger;
+            _httpService = httpService;
         }
 
         public async Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature)
@@ -48,9 +48,8 @@ namespace WebhookRelayService.Services
             var failed = false;
             try
             {
-                var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(user.NotificationEndpoint, stringContent);
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                var httpResponse = await _httpService.SendPost(user.NotificationEndpoint, content);
+                if (httpResponse.StatusCode == HttpStatusCode.NotFound)
                 {
                     failed = true;
                 }
