@@ -16,6 +16,14 @@ builder.WebHost.UseSentry(s =>
     s.TracesSampleRate = 1;
 });
 
+builder.Services.AddLogging(config =>
+{
+    config.ClearProviders();
+    config.AddConfiguration(builder.Configuration.GetSection("Logging"));
+    config.AddConsole();
+    config.AddDebug();
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
