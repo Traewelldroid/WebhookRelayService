@@ -3,6 +3,7 @@ using Sentry;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using WebhookRelayService;
+using WebhookRelayService.BackgroundServices;
 using WebhookRelayService.Models;
 using WebhookRelayService.Repositories;
 using WebhookRelayService.Services;
@@ -27,6 +28,8 @@ builder.Services.AddSingleton(settings);
 builder.Services.AddTransient<IWebhookService, WebhookService>();
 builder.Services.AddTransient<IWebhookUserService, WebhookUserService>();
 builder.Services.AddTransient<IWebhookUserRepository, WebhookUserRepository>();
+
+builder.Services.AddHostedService<ClearWebhookUsers>();
 
 var connectionString = $"{settings.PostgresConnection}{Environment.GetEnvironmentVariable("PG_PASSWORD") ?? ""}";
 builder.Services.AddDbContext<WebhookRelayContext>((options) => options.UseNpgsql(connectionString));

@@ -6,6 +6,7 @@ namespace WebhookRelayService.Repositories
     public interface IWebhookUserRepository
     {
         public Task<WebhookUser> Create(WebhookUser webhookUser);
+        public Task<List<WebhookUser>> GetAll();
         public Task<WebhookUser> GetById(Guid id);
         public Task<WebhookUser> GetByWebhookId(int id);
         public Task Delete(WebhookUser webhookUser);
@@ -25,6 +26,11 @@ namespace WebhookRelayService.Repositories
             _context.WebhookUsers.Add(webhookUser);
             await _context.SaveChangesAsync();
             return webhookUser;
+        }
+
+        public async Task<List<WebhookUser>> GetAll()
+        {
+            return await _context.WebhookUsers.ToListAsync();
         }
 
         public async Task<WebhookUser> GetById(Guid id)

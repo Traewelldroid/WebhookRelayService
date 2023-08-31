@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Sentry;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using WebhookRelayService.Models;
@@ -9,6 +10,7 @@ namespace WebhookRelayService.Services
     public interface IWebhookService
     {
         public Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature);
+        public Task<int> PushNotificationAndHandleResult(WebhookUser user, string content);
     }
 
     public class WebhookService : IWebhookService
@@ -30,14 +32,7 @@ namespace WebhookRelayService.Services
         {
             var user = await _webhookUserRepository.GetByWebhookId(webhookId);
 
-            if (_settings.Logging)
-            {
-                _logger.LogInformation($"Secret: {user.WebhookSecret}");
-            }
-
             await ValidateSignature(user.WebhookSecret, payload, signature);
-
-            var notification = new StringContent(webhook.GetNotificationJson(), Encoding.UTF8, "application/json");
 
             if (_settings.Logging)
             {
@@ -45,15 +40,36 @@ namespace WebhookRelayService.Services
                 _logger.LogInformation("Notification", webhook.GetNotificationJson());
             }
 
-            var response = await _httpClient.PostAsync(user.NotificationEndpoint, notification);
-            if (response.StatusCode == HttpStatusCode.NotFound)
+            await PushNotificationAndHandleResult(user, webhook.GetNotificationJson());
+        }
+
+        public async Task<int> PushNotificationAndHandleResult(WebhookUser user, string content)
+        {
+            var failed = false;
+            try
+            {
+                var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(user.NotificationEndpoint, stringContent);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    failed = true;
+                }
+            }
+            catch
+            {
+                failed = true;
+            }
+
+            if (failed)
             {
                 if (_settings.Logging)
                 {
                     _logger.LogInformation($"Error when pushing notification for webhook user {user.Id}");
                 }
                 await _webhookUserRepository.Delete(user);
+                return 1;
             }
+            return 0;
         }
 
         private async Task ValidateSignature(string secret, string payload, string signature)
