@@ -28,6 +28,9 @@ namespace WebhookRelayService.Controllers
             try
             {
                 var requestBody = await GetRequestBody();
+                var webhookId = int.Parse(Request.Headers["X-Trwl-Webhook-Id"].ToString() ?? "-1");
+                var signature = Request.Headers["Signature"].ToString();
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -36,15 +39,11 @@ namespace WebhookRelayService.Controllers
 
                 if (webhook == null)
                 {
-                    throw new InvalidDataException();
-                }
-
-                var webhookId = int.Parse(Request.Headers["X-Trwl-Webhook-Id"].ToString() ?? "-1");
-                var signature = Request.Headers["Signature"].ToString();
-
-                if (_settings.Logging)
-                {
-                    _logger.LogInformation(requestBody);
+                    if (_settings.Logging)
+                    {
+                        _logger.LogError($"Webhook failed! {webhookId} {requestBody}");
+                    }
+                    throw new InvalidDataException("Invalid Webhook");
                 }
 
                 await _webhookService.HandleWebhook(webhookId, webhook, requestBody, signature);
