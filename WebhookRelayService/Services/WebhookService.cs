@@ -86,6 +86,7 @@ namespace WebhookRelayService.Services
                 {
                     _logger.LogError("Signature verification failed.");
                     _logger.LogError($"Signature: {signature}");
+                    _logger.LogError($"Calculated Signature: {signed}");
                     _logger.LogError($"Secret: {secret}");
                     _logger.LogError($"Payload: {payload}");
                 }
