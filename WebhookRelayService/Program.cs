@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.GetSection("WebhookRelaySettings").Get<Settings>();
 
 logger.Info($"Logging: {settings.Logging}");
+logger.Info($"SkipSignatureCheck: {settings.SkipSignatureCheck}");
 
 builder.WebHost.UseSentry(s =>
 {

@@ -32,7 +32,10 @@ namespace WebhookRelayService.Services
         {
             var user = await _webhookUserRepository.GetByWebhookId(webhookId);
 
-            await ValidateSignature(user.WebhookSecret, payload, signature);
+            if (!_settings.SkipSignatureCheck)
+                await ValidateSignature(user.WebhookSecret, payload, signature);
+            else
+                _logger.LogInformation("Skipped signature check");
 
             if (_settings.Logging)
             {
