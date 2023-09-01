@@ -36,8 +36,7 @@ namespace WebhookRelayService.Services
 
             if (_settings.Logging)
             {
-                _logger.LogInformation("Plain", webhook.Notification);
-                _logger.LogInformation("Notification", webhook.GetNotificationJson());
+                _logger.LogInformation($"Notification {webhook.GetNotificationJson()}");
             }
 
             await PushNotificationAndHandleResult(user, webhook.GetNotificationJson());
@@ -85,7 +84,10 @@ namespace WebhookRelayService.Services
             {
                 if (_settings.Logging)
                 {
-                    _logger.LogInformation("Signature verification failed.");
+                    _logger.LogError("Signature verification failed.");
+                    _logger.LogError($"Signature: {signature}");
+                    _logger.LogError($"Secret: {secret}");
+                    _logger.LogError($"Payload: {payload}");
                 }
                 else
                 {
