@@ -2,6 +2,7 @@
 using Sentry;
 using System.Text;
 using System.Text.Json;
+using WebhookRelayService.BackgroundServices;
 using WebhookRelayService.Models;
 using WebhookRelayService.Services;
 
@@ -11,15 +12,15 @@ namespace WebhookRelayService.Controllers
     [Route("webhook")]
     public class WebhookController : ControllerBase
     {
+        private Queue _queue;
         private ILogger _logger;
-        private IWebhookService _webhookService;
         private Settings _settings;
 
-        public WebhookController(ILogger<WebhookController> logger, IWebhookService webhookService, Settings settings)
+        public WebhookController(ILogger<WebhookController> logger, Settings settings, Queue queue)
         {
             _logger = logger;
-            _webhookService = webhookService;
             _settings = settings;
+            _queue = queue;
         }
 
         [HttpPost]
@@ -46,15 +47,20 @@ namespace WebhookRelayService.Controllers
                     throw new InvalidDataException("Invalid Webhook");
                 }
 
-                await _webhookService.HandleWebhook(webhookId, webhook, requestBody, signature);
-
-                return Ok();
+                await _queue.Enqueue(new WebhookRequest
+                {
+                    WebhookId = webhookId,
+                    Webhook = webhook,
+                    Payload = requestBody,
+                    Signature = signature
+                });
             } catch (Exception ex)
             {
                 _logger.LogError("Webhook error", ex);
                 SentrySdk.CaptureException(ex);
                 return StatusCode(500);
             }
+            return Ok();
         }
 
         private async Task<string> GetRequestBody()

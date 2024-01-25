@@ -9,7 +9,7 @@ namespace WebhookRelayService.Services
 {
     public interface IWebhookService
     {
-        public Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature);
+        public Task HandleWebhook(WebhookRequest request);
         public Task<int> PushNotificationAndHandleResult(WebhookUser user, string content);
     }
 
@@ -28,21 +28,21 @@ namespace WebhookRelayService.Services
             _httpService = httpService;
         }
 
-        public async Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature)
+        public async Task HandleWebhook(WebhookRequest request)
         {
-            var user = await _webhookUserRepository.GetByWebhookId(webhookId);
+            var user = await _webhookUserRepository.GetByWebhookId(request.WebhookId);
 
             if (!_settings.SkipSignatureCheck)
-                await ValidateSignature(user.WebhookSecret, payload, signature);
+                await ValidateSignature(user.WebhookSecret, request.Payload, request.Signature);
             else
                 _logger.LogInformation("Skipped signature check");
 
             if (_settings.Logging)
             {
-                _logger.LogInformation($"Notification {webhook.GetNotificationJson()}");
+                _logger.LogInformation($"Notification {request.Webhook.GetNotificationJson()}");
             }
 
-            await PushNotificationAndHandleResult(user, webhook.GetNotificationJson());
+            await PushNotificationAndHandleResult(user, request.Webhook.GetNotificationJson());
         }
 
         public async Task<int> PushNotificationAndHandleResult(WebhookUser user, string content)
