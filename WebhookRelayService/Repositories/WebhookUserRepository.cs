@@ -8,7 +8,7 @@ namespace WebhookRelayService.Repositories
         public Task<WebhookUser> Create(WebhookUser webhookUser);
         public Task<List<WebhookUser>> GetAll();
         public Task<WebhookUser> GetById(Guid id);
-        public Task<WebhookUser> GetByWebhookId(int id);
+        public Task<WebhookUser?> GetByWebhookId(int id);
         public Task Delete(WebhookUser webhookUser);
     }
 
@@ -39,9 +39,9 @@ namespace WebhookRelayService.Repositories
             return user;
         }
 
-        public async Task<WebhookUser> GetByWebhookId(int id)
+        public async Task<WebhookUser?> GetByWebhookId(int id)
         {
-            var user = await _context.WebhookUsers.FirstAsync(u => u.WebhookId == id);
+            var user = await _context.WebhookUsers.FirstOrDefaultAsync(u => u.WebhookId == id);
             return user;
         }
 

@@ -46,7 +46,12 @@ namespace WebhookRelayService.Controllers
                     throw new InvalidDataException("Invalid Webhook");
                 }
 
-                await _webhookService.HandleWebhook(webhookId, webhook, requestBody, signature);
+                var result = await _webhookService.HandleWebhook(webhookId, webhook, requestBody, signature);
+
+                if (result == "gone")
+                {
+                    return StatusCode(410);
+                }
 
                 return Ok();
             } catch (Exception ex)

@@ -9,7 +9,7 @@ namespace WebhookRelayService.Services
 {
     public interface IWebhookService
     {
-        public Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature);
+        public Task<string> HandleWebhook(int webhookId, Webhook webhook, string payload, string signature);
         public Task<int> PushNotificationAndHandleResult(WebhookUser user, string content);
     }
 
@@ -28,21 +28,34 @@ namespace WebhookRelayService.Services
             _httpService = httpService;
         }
 
-        public async Task HandleWebhook(int webhookId, Webhook webhook, string payload, string signature)
+        public async Task<string> HandleWebhook(int webhookId, Webhook webhook, string payload, string signature)
         {
-            var user = await _webhookUserRepository.GetByWebhookId(webhookId);
-
-            if (!_settings.SkipSignatureCheck)
-                await ValidateSignature(user.WebhookSecret, payload, signature);
-            else
-                _logger.LogInformation("Skipped signature check");
-
-            if (_settings.Logging)
+            try
             {
-                _logger.LogInformation($"Notification {webhook.GetNotificationJson()}");
-            }
+                var user = await _webhookUserRepository.GetByWebhookId(webhookId);
+                if (user == null)
+                {
+                    return "gone";
+                }
 
-            await PushNotificationAndHandleResult(user, webhook.GetNotificationJson());
+                if (!_settings.SkipSignatureCheck)
+                    await ValidateSignature(user.WebhookSecret, payload, signature);
+                else
+                    _logger.LogInformation("Skipped signature check");
+
+                if (_settings.Logging)
+                {
+                    _logger.LogInformation($"Notification {webhook.GetNotificationJson()}");
+                }
+
+                await PushNotificationAndHandleResult(user, webhook.GetNotificationJson());
+                return "ok";
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return "error";
+            }
         }
 
         public async Task<int> PushNotificationAndHandleResult(WebhookUser user, string content)
