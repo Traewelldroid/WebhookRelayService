@@ -40,7 +40,6 @@ builder.Services.AddTransient<IHttpService, HttpService>();
 builder.Services.AddTransient<IWebhookUserRepository, WebhookUserRepository>();
 
 builder.Services.AddHostedService<ClearWebhookUsers>();
-builder.Services.AddHostedService<Queue>();
 
 var connectionString = $"{settings.PostgresConnection}{Environment.GetEnvironmentVariable("PG_PASSWORD") ?? ""}";
 builder.Services.AddDbContext<WebhookRelayContext>((options) => options.UseNpgsql(connectionString));
