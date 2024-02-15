@@ -8,6 +8,7 @@ namespace WebhookRelayService.Services
     {
         public Task<Guid> Create(WebhookUserCreateDTO dto);
         public Task Delete(Guid id);
+        public Task<int> GetRegisteredUsersCount();
     }
 
     public class WebhookUserService : IWebhookUserService
@@ -41,6 +42,11 @@ namespace WebhookRelayService.Services
         {
             var user = await _repository.GetById(id);
             await _repository.Delete(user);
+        }
+
+        public async Task<int> GetRegisteredUsersCount()
+        {
+            return await _repository.Count();
         }
 
         private async Task<bool> CheckEndpoint(string endpoint)

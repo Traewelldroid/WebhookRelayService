@@ -10,6 +10,7 @@ namespace WebhookRelayService.Repositories
         public Task<WebhookUser> GetById(Guid id);
         public Task<WebhookUser?> GetByWebhookId(int id);
         public Task Delete(WebhookUser webhookUser);
+        public Task<int> Count();
     }
 
     public class WebhookUserRepository : IWebhookUserRepository
@@ -49,6 +50,11 @@ namespace WebhookRelayService.Repositories
         {
             _context.WebhookUsers.Remove(webhookUser);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> Count()
+        {
+            return await _context.WebhookUsers.CountAsync();
         }
     }
 }
